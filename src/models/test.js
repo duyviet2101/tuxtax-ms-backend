@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const TestSchema = new mongoose.Schema({
   name: {
@@ -8,5 +9,7 @@ const TestSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+TestSchema.plugin(mongooseAutoPopulate);
 
 export default mongoose.model('Test', TestSchema, 'test');

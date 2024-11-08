@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import config from "../../config.js";
+import {User} from "../models/index.js";
 
 const NODE_ENV = process.env.NODE_ENV;
 const isProd = NODE_ENV === 'production';
@@ -20,11 +21,30 @@ const options = {
   pass: config.MONGO_PASS,
 };
 
+const initAdminUser = async () => {
+  const admin = await User.findOne({role: 'admin'});
+  if (!admin) {
+    try {
+      await User.createUser({
+        email: 'tuxtax_admin@admin.admin',
+        name: 'admin',
+        password: 'admin',
+        role: 'admin',
+        active: true,
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+  console.log("A admin user has been created with email:tuxtax_admin@admin.admin, password:admin");
+}
+
 export const initializeMongoConnection = () => {
   mongoose
     .connect(config.MONGO_URL ? config.MONGO_URL : `mongodb://${config.MONGO_HOST}:${config.MONGO_PORT}`, options)
     .then(() => {
       console.log(`Connect to mongodb://${config.MONGO_HOST}:${config.MONGO_PORT} success.`);
+      initAdminUser();
     })
     .catch(error => {
       console.log(error);
