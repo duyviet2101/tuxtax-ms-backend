@@ -10,7 +10,9 @@ const config = {
   MONGO_HOST: process.env.MONGO_HOST || 'localhost',
   MONGO_PORT: process.env.MONGO_PORT || 27017,
   MONGO_DB: process.env.MONGO_DB || 'tuxtax_db',
-  MONGO_URL: process.env.MONGO_URL ||  'mongodb://localhost:27017/tuxtax_db',
+  // MONGO_URL: process.env.MONGO_URL ||  'mongodb://localhost:27017/tuxtax_db',
+  MONGO_URL: process.env.MONGO_URL ||  'mongodb://tuxtax:tuxtax%40123@101.96.66.218:8005/?authSource=tuxtax-db',
+
 }
 
 export default config;
