@@ -1,48 +1,59 @@
 import { BadRequestError } from "../../exception/errorResponse.js";
-import Product from "../../models/product.model.js";
-
-const getError = async () => {
-  throw new BadRequestError();
-};
+import { Product } from "../../models/index.js";
+import { removeEmptyKeys } from "../../helpers/lodashFuncs.js";
+import _ from "lodash";
+import { PRODUCT_FIELDS } from "../../constants/product.js";
 
 const createProduct = async (data) => {
-  const product = new Product(data);
-  return await product.save();
+  const product = Product.createProduct(data);
+  return product;
 };
 
-const getAllProducts = async () => {
-  const products = await Product.find();
-  return products;
+const getAllProducts = async (data) => {
+  const options = {
+    select: PRODUCT_FIELDS,
+  };
+  if (data.page) {
+    options.page = parseInt(data.page);
+  }
+  if (data.limit) {
+    options.limit = parseInt(data.limit);
+  }
+  if (data.sortBy && data.order) {
+    options.sort = { [data.sortBy]: data.order };
+  }
+
+  return await Product.paginate({}, options);
 };
 
 const getProductBySlug = async (slug) => {
-  const product = await Product.findOne({ slug });
+  const product = await Product.findOne({ slug }).lean();
   if (!product) {
-    throw new Error("Không tìm thấy sản phẩm!");
+    throw new Error("product_not_existed");
   }
-  return product;
+  return _.pick(product, PRODUCT_FIELDS);
 };
 
-const updateProduct = async (slug, updatedData) => {
-  const product = await Product.findOneAndUpdate({ slug }, updatedData, {
+const updateProduct = async (id, updatedData) => {
+  const data = removeEmptyKeys(updatedData);
+  if (_.isEmpty(data)) {
+    throw new BadRequestError("data_required");
+  }
+  const product = await Product.findOneAndUpdate({ _id: id }, data, {
     new: true,
   });
   if (!product) {
-    throw new Error("Không tìm thấy sản phẩm!");
+    throw new Error("product_not_existed");
   }
-  return product;
+  return _.pick(product.toObject(), PRODUCT_FIELDS);
 };
 
-const deleteProduct = async (slug) => {
-  const product = await Product.findOneAndUpdate(
-    { slug },
-    { deleted: true },
-    { new: true }
-  );
+const deleteProduct = async (id) => {
+  const product = await Product.findByIdAndDelete(id);
   if (!product) {
-    throw new Error("Không tìm thấy sản phẩm!");
+    throw new Error("product_not_existed");
   }
-  return product;
+  return _.pick(product.toObject(), PRODUCT_FIELDS);
 };
 
 export default {
@@ -51,5 +62,4 @@ export default {
   getProductBySlug,
   updateProduct,
   deleteProduct,
-  getError,
 };

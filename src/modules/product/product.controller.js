@@ -1,11 +1,6 @@
 import productService from "./product.service.js";
 import catchAsync from "../../utils/catchAsync.js";
 
-const getError = catchAsync(async (req, res, next) => {
-  const data = await productService.getError();
-  res.json(data);
-});
-
 const createProduct = catchAsync(async (req, res, next) => {
   const data = req.body;
   const product = await productService.createProduct(data);
@@ -13,8 +8,9 @@ const createProduct = catchAsync(async (req, res, next) => {
 });
 
 const getAllProducts = catchAsync(async (req, res, next) => {
-  const data = await productService.getAllProducts();
-  res.json(data);
+  const data = req.query;
+  const product = await productService.getAllProducts(data);
+  res.json(product);
 });
 
 const getProductBySlug = catchAsync(async (req, res, next) => {
@@ -24,15 +20,15 @@ const getProductBySlug = catchAsync(async (req, res, next) => {
 });
 
 const updateProduct = catchAsync(async (req, res, next) => {
-  const slug = req.params.slug;
+  const id = req.params.id;
   const updatedData = req.body;
-  const data = await productService.updateProduct(slug, updatedData);
+  const data = await productService.updateProduct(id, updatedData);
   res.json(data);
 });
 
 const deleteProduct = catchAsync(async (req, res, next) => {
-  const slug = req.params.slug;
-  const data = await productService.deleteProduct(slug);
+  const id = req.params.id;
+  const data = await productService.deleteProduct(id);
   res.json(data);
 });
 
@@ -42,5 +38,4 @@ export default {
   getProductBySlug,
   updateProduct,
   deleteProduct,
-  getError,
 };

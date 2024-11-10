@@ -1,0 +1,16 @@
+export const PRODUCT_FIELDS = [
+  "_id",
+  "slug",
+  "name",
+  "price",
+  "image",
+  "description",
+  "quantity",
+  "category",
+  "rating",
+  "status",
+  "deleted",
+  "createdAt",
+  "updatedAt",
+  "deletedAt",
+];

@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
-// name, price, image
-// slug, description, quantity, category,
-//  rating (cái này tạm thời để vậy nếu k cần dùng thì bỏ),
-//  status (available, not avai), deleted (true, false)
+import paginate from "mongoose-paginate-v2";
+import {BadRequestError} from "../exception/errorResponse.js";
 
 const productSchema = new mongoose.Schema(
   {
@@ -71,6 +69,16 @@ productSchema.pre("save", function (next) {
   next();
 });
 
-// export default mongoose.model("Test", TestSchema, "test");
-const Product = mongoose.model("Product", productSchema);
-export default Product;
+// Check sản phẩm đã tồn tại chưa
+productSchema.statics.createProduct = async function (data) {
+  const existProduct = await this.findOne({
+    slug : data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") .replace(/^-+|-+$/g, "")
+  });
+  if (existProduct) {
+    throw new BadRequestError("product_existed");
+  }
+  return this.create(data);
+}
+
+productSchema.plugin(paginate);
+export default mongoose.model('Product', productSchema, 'products');
