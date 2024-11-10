@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
-import {BadRequestError} from "../exception/errorResponse.js";
+import { BadRequestError } from "../exception/errorResponse.js";
 
 const productSchema = new mongoose.Schema(
   {
@@ -72,13 +72,13 @@ productSchema.pre("save", function (next) {
 // Check sản phẩm đã tồn tại chưa
 productSchema.statics.createProduct = async function (data) {
   const existProduct = await this.findOne({
-    slug : data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") .replace(/^-+|-+$/g, "")
+    name: { $regex: new RegExp(`^${data.name}$`, "i") },
   });
   if (existProduct) {
     throw new BadRequestError("product_existed");
   }
   return this.create(data);
-}
+};
 
 productSchema.plugin(paginate);
-export default mongoose.model('Product', productSchema, 'products');
+export default mongoose.model("Product", productSchema, "products");
