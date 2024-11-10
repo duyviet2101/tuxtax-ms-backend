@@ -5,8 +5,8 @@ import _ from "lodash";
 import { PRODUCT_FIELDS } from "../../constants/product.js";
 
 const createProduct = async (data) => {
-  const product = Product.createProduct(data);
-  return product;
+  const product = new Product(data);
+  return await product.save();
 };
 
 const getAllProducts = async (data) => {
@@ -27,9 +27,11 @@ const getAllProducts = async (data) => {
 };
 
 const getProductBySlug = async (slug) => {
-  const product = await Product.findOne({ slug }).lean();
+  const parts = slug.split("-");
+  const id = parts[parts.length - 1];
+  const product = await Product.findById(id).lean();
   if (!product) {
-    throw new Error("product_not_existed");
+    throw new BadRequestError("product_not_existed");
   }
   return _.pick(product, PRODUCT_FIELDS);
 };
@@ -43,7 +45,7 @@ const updateProduct = async (id, updatedData) => {
     new: true,
   });
   if (!product) {
-    throw new Error("product_not_existed");
+    throw new BadRequestError("product_not_existed");
   }
   return _.pick(product.toObject(), PRODUCT_FIELDS);
 };
@@ -51,7 +53,7 @@ const updateProduct = async (id, updatedData) => {
 const deleteProduct = async (id) => {
   const product = await Product.findByIdAndDelete(id);
   if (!product) {
-    throw new Error("product_not_existed");
+    throw new BadRequestError("product_not_existed");
   }
   return _.pick(product.toObject(), PRODUCT_FIELDS);
 };

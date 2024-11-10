@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
-import { BadRequestError } from "../exception/errorResponse.js";
+import slugify from "slugify";
 
 const productSchema = new mongoose.Schema(
   {
@@ -61,24 +61,10 @@ const productSchema = new mongoose.Schema(
 // Tạo slug tự động từ name trước khi lưu
 productSchema.pre("save", function (next) {
   if (!this.slug) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-") // Thay ký tự đặc biệt và khoảng trắng bằng dấu gạch ngang
-      .replace(/^-+|-+$/g, ""); // Loại bỏ dấu gạch ngang thừa ở đầu và cuối
+    this.slug = `${slugify(this.name, { lower: true })}_${this._id}`;
   }
   next();
 });
-
-// Check sản phẩm đã tồn tại chưa
-productSchema.statics.createProduct = async function (data) {
-  const existProduct = await this.findOne({
-    name: { $regex: new RegExp(`^${data.name}$`, "i") },
-  });
-  if (existProduct) {
-    throw new BadRequestError("product_existed");
-  }
-  return this.create(data);
-};
 
 productSchema.plugin(paginate);
 export default mongoose.model("Product", productSchema, "products");
