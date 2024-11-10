@@ -61,9 +61,16 @@ const productSchema = new mongoose.Schema(
 // Tạo slug tự động từ name trước khi lưu
 productSchema.pre("save", function (next) {
   if (!this.slug) {
-    this.slug = `${slugify(this.name, { lower: true })}_${this._id}`;
+    this.slug = slugify(`${this.name} ${this._id}`, { lower: true, locale: 'vi' });
   }
   next();
+});
+
+productSchema.post(["findOneAndUpdate"], function (doc) {
+  if (doc) {
+    doc.slug = slugify(`${doc?.name} ${doc?._id}`, { lower: true, locale: 'vi' });
+    return doc.save();
+  }
 });
 
 productSchema.plugin(paginate);
