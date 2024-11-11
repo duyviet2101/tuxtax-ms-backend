@@ -3,24 +3,46 @@ import { Product } from "../../models/index.js";
 import { removeEmptyKeys } from "../../helpers/lodashFuncs.js";
 import _ from "lodash";
 import { PRODUCT_FIELDS } from "../../constants/product.js";
+import CategoriesService from "../categories/categories.service.js";
 
 const createProduct = async (data) => {
+  if (data.category) {
+    const categoryExists = await CategoriesService.getCategoryByIdOrSlug({slug: data.category});
+    if (!categoryExists) {
+      throw new BadRequestError("category_not_existed");
+    }
+  }
   const product = new Product(data);
   return await product.save();
 };
 
-const getAllProducts = async (data) => {
+const getAllProducts = async ({
+  page,
+  limit,
+  sortBy,
+  order,
+  search,
+  category,
+}) => {
   const options = {
     select: PRODUCT_FIELDS,
   };
-  if (data.page) {
-    options.page = parseInt(data.page);
+  if (page) {
+    options.page = parseInt(page);
   }
-  if (data.limit) {
-    options.limit = parseInt(data.limit);
+  if (limit) {
+    options.limit = parseInt(limit);
   }
-  if (data.sortBy && data.order) {
-    options.sort = { [data.sortBy]: data.order };
+  if (sortBy && order) {
+    options.sort = { [sortBy]: order };
+  }
+
+  const queries = {};
+  if (search) {
+    queries.name = { $regex: search, $options: "i" };
+  }
+  if (category) {
+    queries.category = category;
   }
 
   return await Product.paginate({}, options);
@@ -29,7 +51,7 @@ const getAllProducts = async (data) => {
 const getProductBySlug = async (slug) => {
   const parts = slug.split("-");
   const id = parts[parts.length - 1];
-  const product = await Product.findById(id).lean();
+  const product = await Product.findById(id);
   if (!product) {
     throw new BadRequestError("product_not_existed");
   }

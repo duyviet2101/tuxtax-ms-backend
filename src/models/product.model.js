@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 import slugify from "slugify";
+import mongooseAutoPopulate from "mongoose-autopopulate";
 
 const productSchema = new mongoose.Schema(
   {
@@ -34,8 +35,10 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
     category: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      default: null,
+      autopopulate: true
     },
     rating: {
       type: Number,
@@ -45,7 +48,7 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "not available"],
+      enum: ["available", "not_available"],
       default: "available",
     },
     deleted: {
@@ -74,4 +77,7 @@ productSchema.post(["findOneAndUpdate"], function (doc) {
 });
 
 productSchema.plugin(paginate);
+
+productSchema.plugin(mongooseAutoPopulate);
+
 export default mongoose.model("Product", productSchema, "products");
