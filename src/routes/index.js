@@ -6,6 +6,7 @@ import AuthRoute from "../modules/auth/auth.route.js";
 import CategoriesRoute from "../modules/categories/categories.route.js";
 import FloorsRoute from "../modules/floors/floors.route.js";
 import TablesRoute from "../modules/tables/tables.route.js";
+import OrderRoute from "../modules/orders/order.route.js";
 
 const router = express.Router();
 
@@ -22,5 +23,7 @@ router.use('/categories', CategoriesRoute);
 router.use('/floors', FloorsRoute);
 
 router.use('/tables', TablesRoute);
+
+router.use('/orders', OrderRoute);
 
 export default router;

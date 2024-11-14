@@ -30,7 +30,7 @@ const createCategory = catchAsync(async (req, res, next) => {
     image: req?.body?.image,
     parent: req?.body?.parent,
   });
-  res.json(data);
+  res.status(201).json(data);
 });
 
 const updateCategory = catchAsync(async (req, res, next) => {

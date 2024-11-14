@@ -24,7 +24,7 @@ const createTable = catchAsync(async (req, res, next) => {
     floor: req?.body?.floor,
     capacity: req?.body?.capacity,
   });
-  res.json(data);
+  res.status(201).json(data);
 });
 
 const updateTable = catchAsync(async (req, res, next) => {

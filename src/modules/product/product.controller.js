@@ -12,7 +12,7 @@ const createProduct = catchAsync(async (req, res, next) => {
     quantity: data?.quantity,
     status: data?.status,
   });
-  res.json(product);
+  res.status(201).json(product);
 });
 
 const getAllProducts = catchAsync(async (req, res, next) => {

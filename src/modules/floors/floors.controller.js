@@ -21,7 +21,7 @@ const createFloor = catchAsync(async (req, res, next) => {
   const floor = await FloorsService.createFloor({
     name: req?.body?.name
   });
-  res.json(floor);
+  res.status(201).json(floor);
 });
 
 const updateFloor = catchAsync(async (req, res, next) => {

@@ -1,4 +1,4 @@
-import {Floor, Table} from "../../models/index.js";
+import {Floor, Order, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
 
@@ -10,7 +10,10 @@ const getAllTables = async ({
   search,
   floor
 }) => {
-  const options = {};
+  const options = {
+    populate: "floor",
+    lean: true
+  };
   if (page) {
     options.page = parseInt(page);
   }
@@ -29,11 +32,30 @@ const getAllTables = async ({
     query.floor = floor;
   }
 
-  return await Table.paginate(query, options);
+  const tables = await Table.paginate(query, options);
+  for (const table of tables.docs) {
+    const order = await Order.findOne({
+      table: table._id,
+      status: 'pending'
+    });
+    if (order) {
+      table.order = order;
+    }
+  }
+  return tables;
 }
 
 const getTableById = async (id) => {
   const res = await Table.findById(id).populate('floor').lean();
+
+  const order = await Order.findOne({
+    table: res._id,
+    status: 'pending'
+  });
+  if (order) {
+    res.order = order;
+  }
+
   if (!res) {
     throw new BadRequestError('table_not_existed');
   }
