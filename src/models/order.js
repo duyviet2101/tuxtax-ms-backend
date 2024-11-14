@@ -41,6 +41,10 @@ const OrderSchema = new mongoose.Schema({
     enum: ['pending', 'completed'],
     default: 'pending'
   },
+  isPaid: {
+    type: Boolean,
+    default: false
+  },
 }, {
   timestamps: true,
 });

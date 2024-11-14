@@ -58,6 +58,23 @@ const deleteOrder = catchAsync(async (req, res, next) => {
   res.json(data);
 });
 
+const addProductToOrder = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.addProductToOrder({
+    id: req?.params?.id,
+    product: req?.body?.product,
+    quantity: req?.body?.quantity,
+  });
+  res.json(data);
+});
+
+const updateIsPaidOrder = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.updateIsPaidOrder({
+    id: req?.params?.id,
+    isPaid: req?.body?.isPaid,
+  });
+  res.json(data);
+});
+
 export default {
   createOrder,
   getOrders,
@@ -66,4 +83,6 @@ export default {
   updateQuantityProduct,
   deleteProductInOrder,
   deleteOrder,
+  updateIsPaidOrder,
+  addProductToOrder
 }

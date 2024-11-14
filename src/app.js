@@ -61,6 +61,12 @@ const options = {
   apis: [
     "./src/modules/helloWorld/helloWorld.route.js",
     "./src/modules/product/product.route.js",
+    "./src/modules/users/users.route.js",
+    "./src/modules/auth/auth.route.js",
+    "./src/modules/categories/categories.route.js",
+    "./src/modules/floors/floors.route.js",
+    "./src/modules/tables/tables.route.js",
+    "./src/modules/orders/order.route.js",
   ],
 };
 

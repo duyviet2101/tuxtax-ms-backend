@@ -141,6 +141,48 @@ const deleteProductInOrder = async ({
   return order;
 }
 
+const addProductToOrder = async ({
+  id,
+  product,
+  quantity
+}) => {
+  const order = await Order.findById(id, {}, {autopopulate: false});
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+
+  const productExist = await Product.findById(product);
+  if (!productExist) {
+    throw new BadRequestError("product_not_existed");
+  }
+
+  const productIndex = order.products.findIndex(item => item.product.toString() === product);
+  if (productIndex !== -1) {
+    order.products[productIndex].quantity = quantity;
+  } else {
+    order.products.push({
+      product,
+      quantity,
+      price: productExist.price,
+    });
+  }
+}
+
+const updateIsPaidOrder = async ({
+  id,
+  isPaid
+}) => {
+  const order = await Order.findByIdAndUpdate(id, {
+    isPaid
+  }, {
+    new: true
+  });
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+  return order;
+}
+
 export default {
   createOrder,
   getOrders,
@@ -148,5 +190,7 @@ export default {
   updateStatusOrder,
   deleteOrder,
   updateQuantityProduct,
-  deleteProductInOrder
+  deleteProductInOrder,
+  addProductToOrder,
+  updateIsPaidOrder
 };
