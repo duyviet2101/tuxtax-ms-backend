@@ -9,6 +9,7 @@ const getAllTables = catchAsync(async (req, res, next) => {
     order: req.query.order,
     search: req.query.search,
     floor: req.query.floor,
+    filters: req.query.filters
   });
   res.json(data);
 });
@@ -23,6 +24,7 @@ const createTable = catchAsync(async (req, res, next) => {
     name: req?.body?.name,
     floor: req?.body?.floor,
     capacity: req?.body?.capacity,
+    active: req?.body?.active
   });
   res.status(201).json(data);
 });
@@ -33,6 +35,7 @@ const updateTable = catchAsync(async (req, res, next) => {
     name: req?.body?.name,
     floor: req?.body?.floor,
     capacity: req?.body?.capacity,
+    active: req?.body?.active
   });
   res.json(data);
 });

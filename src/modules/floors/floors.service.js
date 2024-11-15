@@ -2,6 +2,7 @@ import {Floor, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
 import parseFilters from "../../helpers/parseFilters.js";
+import _ from "lodash";
 
 const getAllFloors = async ({
   page,
@@ -73,16 +74,33 @@ const updateFloor = async ({
   if (!floor) {
     throw new BadRequestError('floor_not_existed');
   }
+
+  if (_.isBoolean(data.active)) {
+    await Table.updateMany({
+      floor: id
+    }, {
+      active: data.active
+    });
+  }
+
   return floor;
 }
 
 const deleteFloor = async ({
   id
 }) => {
+  const tables = await Table.find({
+    floor: id
+  });
+  if (tables.length > 0) {
+    throw new BadRequestError('floor_has_tables');
+  }
+
   const floor = await Floor.findByIdAndDelete(id);
   if (!floor) {
     throw new BadRequestError('floor_not_existed');
   }
+
   return floor;
 }
 

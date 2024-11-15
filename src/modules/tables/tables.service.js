@@ -1,6 +1,7 @@
 import {Floor, Order, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
+import parseFilters from "../../helpers/parseFilters.js";
 
 const getAllTables = async ({
   page,
@@ -8,7 +9,8 @@ const getAllTables = async ({
   sortBy,
   order,
   search,
-  floor
+  floor,
+  filters
 }) => {
   const options = {
     populate: "floor",
@@ -30,6 +32,9 @@ const getAllTables = async ({
   }
   if (floor) {
     query.floor = floor;
+  }
+  if (filters) {
+    parseFilters(query, filters);
   }
 
   const tables = await Table.paginate(query, options);
@@ -65,7 +70,8 @@ const getTableById = async (id) => {
 const createTable = async ({
   name,
   floor,
-  capacity
+  capacity,
+  active
 }) => {
   const floorExists = await Floor.findById(floor);
   if (!floorExists) {
@@ -75,7 +81,8 @@ const createTable = async ({
   return await Table.create({
     name,
     floor,
-    capacity
+    capacity,
+    active
   });
 }
 
@@ -83,12 +90,14 @@ const updateTable = async ({
   id,
   name,
   floor,
-  capacity
+  capacity,
+  active
 }) => {
   const data = removeEmptyKeys({
     name,
     floor,
-    capacity
+    capacity,
+    active
   })
 
   if (data.floor) {
