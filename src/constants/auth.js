@@ -10,7 +10,7 @@ export const USER_FIELDS = [
   'name',
   'phone',
   'role',
-  'status',
+  'active',
   'createdAt',
   'updatedAt',
   'deletedAt',
