@@ -41,6 +41,7 @@ UserSchema.statics.createUser = async function ({
   password,
   role,
   active,
+  phone
 }) {
   const existUser = await this.findOne({
     email: email
@@ -56,6 +57,7 @@ UserSchema.statics.createUser = async function ({
     password: hashedPassword,
     role,
     active,
+    phone
   });
 }
 

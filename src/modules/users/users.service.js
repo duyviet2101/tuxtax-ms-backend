@@ -10,6 +10,7 @@ const createUser = async ({
   password,
   role,
   active,
+  phone
 }) => {
   const user = await User.createUser({
     email,
@@ -17,6 +18,7 @@ const createUser = async ({
     password,
     role,
     active,
+    phone
   });
   return _.pick(user.toObject(), USER_FIELDS);
 };
@@ -59,12 +61,14 @@ const updateUser = async ({
   name,
   role,
   active,
+  phone
 }) => {
   const data = removeEmptyKeys({
     email,
     name,
     role,
     active,
+    phone
   });
   if (_.isEmpty(data)) {
     throw new BadRequestError("data_required");
