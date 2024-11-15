@@ -20,8 +20,8 @@ const createProduct = async (data) => {
 const getAllProducts = async ({
   page,
   limit,
-  sortBy,
-  order,
+  sortBy = "createdAt",
+  order = "desc",
   search,
   category,
   filters
