@@ -7,6 +7,7 @@ const getUsers = catchAsync(async (req, res, next) => {
     limit: req?.query?.limit,
     sortBy: req?.query?.sortBy,
     order: req?.query?.order,
+    filters: req?.query?.filters,
   });
   res.json(data);
 })

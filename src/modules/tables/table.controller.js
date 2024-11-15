@@ -8,7 +8,7 @@ const getAllTables = catchAsync(async (req, res, next) => {
     sortBy: req.query.sortBy,
     order: req.query.order,
     search: req.query.search,
-    category: req.query.category,
+    floor: req.query.floor,
   });
   res.json(data);
 });

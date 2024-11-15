@@ -1,5 +1,6 @@
 import {Order, Product, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
+import parseFilters from "../../helpers/parseFilters.js";
 
 const createOrder = async ({
   table,
@@ -36,6 +37,7 @@ const getOrders = async ({
   limit,
   sortBy,
   order,
+  filters
 }) => {
   const options = {};
   if (page) {
@@ -48,7 +50,12 @@ const getOrders = async ({
     options.sort = {[sortBy]: order};
   }
 
-  return await Order.paginate({}, options);
+  const queries = {};
+  if (filters) {
+    parseFilters(queries, filters);
+  }
+
+  return await Order.paginate(queries, options);
 }
 
 const getOrderById = async ({

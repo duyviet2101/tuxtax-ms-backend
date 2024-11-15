@@ -14,7 +14,10 @@ export const userMiddleware = catchAsync(async (req, res, next) => {
     const { email } = await verifyJwt(jwt);
     const user = await User.findOne({email}).select('-password -__v -createdAt -updatedAt');
     if (!user) {
-      throw new AuthenticationError('user_not_found');
+      throw new AuthenticationError('user_not_existed');
+    }
+    if (!user.active) {
+      throw new AuthenticationError('account_not_active');
     }
 
     req.user = user;

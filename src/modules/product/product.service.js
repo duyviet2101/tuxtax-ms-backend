@@ -4,6 +4,7 @@ import { removeEmptyKeys } from "../../helpers/lodashFuncs.js";
 import _ from "lodash";
 import { PRODUCT_FIELDS } from "../../constants/product.js";
 import CategoriesService from "../categories/categories.service.js";
+import parseFilters from "../../helpers/parseFilters.js";
 
 const createProduct = async (data) => {
   if (data.category) {
@@ -23,6 +24,7 @@ const getAllProducts = async ({
   order,
   search,
   category,
+  filters
 }) => {
   const options = {
     select: PRODUCT_FIELDS,
@@ -44,8 +46,11 @@ const getAllProducts = async ({
   if (category) {
     queries.category = category;
   }
+  if (filters) {
+    parseFilters(queries, filters);
+  }
 
-  return await Product.paginate({}, options);
+  return await Product.paginate(queries, options);
 };
 
 const getProductBySlug = async (slug) => {

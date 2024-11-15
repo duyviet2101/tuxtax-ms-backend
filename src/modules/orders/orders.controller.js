@@ -15,6 +15,7 @@ const getOrders = catchAsync(async (req, res, next) => {
     limit: req?.query?.limit,
     sortBy: req?.query?.sortBy,
     order: req?.query?.order,
+    fitlers: req?.query?.filters,
   });
   res.json(data);
 });

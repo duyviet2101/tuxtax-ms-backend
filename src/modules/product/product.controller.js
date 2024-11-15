@@ -23,6 +23,7 @@ const getAllProducts = catchAsync(async (req, res, next) => {
     order: req?.query?.order,
     search: req?.query?.search,
     category: req?.query?.category,
+    filters: req?.query?.filters,
   });
   res.json(product);
 });

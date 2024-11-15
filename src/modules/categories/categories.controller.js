@@ -8,6 +8,7 @@ const getAllCategories = catchAsync(async (req, res, next) => {
     sortBy: req?.query?.sortBy,
     order: req?.query?.order,
     search: req?.query?.search,
+    filters: req?.query?.filters,
   });
   res.json(data);
 });

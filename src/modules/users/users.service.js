@@ -3,6 +3,7 @@ import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
 import _ from "lodash";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import {USER_FIELDS} from "../../constants/auth.js";
+import parseFilters from "../../helpers/parseFilters.js";
 
 const createUser = async ({
   email,
@@ -28,6 +29,7 @@ const getUsers = async ({
   limit,
   sortBy,
   order,
+  filters
 }) => {
   const options = {
     select: USER_FIELDS,
@@ -42,7 +44,12 @@ const getUsers = async ({
     options.sort = {[sortBy]: order};
   }
 
-  return await User.paginate({}, options);
+  const queries = {};
+  if (filters) {
+    parseFilters(queries, filters);
+  }
+
+  return await User.paginate(queries, options);
 }
 
 const getUserById = async ({
@@ -70,6 +77,7 @@ const updateUser = async ({
     active,
     phone
   });
+  console.log(data)
   if (_.isEmpty(data)) {
     throw new BadRequestError("data_required");
   }

@@ -1,13 +1,15 @@
 import {Category, Product} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
+import parseFilters from "../../helpers/parseFilters.js";
 
 const getAllCategories = async ({
   page,
   limit,
   sortBy,
   order,
-  search
+  search,
+  filters
 }) => {
   const options = {};
   if (page) {
@@ -23,6 +25,9 @@ const getAllCategories = async ({
   const queries = {};
   if (search) {
     queries.name = {$regex: search, $options : 'i'};
+  }
+  if (filters) {
+    parseFilters(queries, filters);
   }
 
   return await Category.paginate(queries, options);
