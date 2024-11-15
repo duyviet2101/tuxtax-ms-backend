@@ -107,6 +107,18 @@ const deleteCategory = async ({
   if (!res) {
     throw new BadRequestError('category_not_existed');
   }
+
+  const products = await Product.find({
+    category: id
+  });
+  if (products.length > 0) {
+    await Product.updateMany({
+      category: id
+    }, {
+      category: null
+    });
+  }
+
   return res;
 };
 

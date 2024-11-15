@@ -27,4 +27,7 @@ jobs:
           echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
           echo "MONGO_USERNAME=${{ secrets.MONGO_USERNAME }}" >> .env
           echo "MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}" >> .env
+          echo "CLOUD_NAME=${{ secrets.CLOUD_NAME }}" >> .env
+          echo "CLOUD_KEY=${{ secrets.CLOUD_KEY }}" >> .env
+          echo "CLOUD_SECRET=${{ secrets.CLOUD_SECRET }}" >> .env
       - run: pm2 restart tuxtax-backend

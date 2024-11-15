@@ -15,7 +15,10 @@ const config = {
   ACCESS_TOKEN_LIFETIME: process.env.ACCESS_TOKEN_LIFETIME || THIRTY_DAYS,
   REFRESH_TOKEN_LIFETIME: process.env.REFRESH_TOKEN_LIFETIME || THIRTY_DAYS,
   JWT_SECRET: process.env.JWT_SECRET || 'very-secret',
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'very-very-secret'
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'very-very-secret',
+  CLOUD_NAME: process.env.CLOUD_NAME || '',
+  CLOUD_KEY: process.env.CLOUD_KEY || '',
+  CLOUD_SECRET: process.env.CLOUD_SECRET || '',
 }
 
 export default config;
