@@ -30,6 +30,7 @@ const createCategory = catchAsync(async (req, res, next) => {
     description: req?.body?.description,
     image: req?.body?.image,
     parent: req?.body?.parent,
+    active: req?.body?.active,
   });
   res.status(201).json(data);
 });
@@ -41,6 +42,7 @@ const updateCategory = catchAsync(async (req, res, next) => {
     description: req?.body?.description,
     image: req?.body?.image,
     parent: req?.body?.parent,
+    active: req?.body?.active,
   });
   res.json(data);
 });

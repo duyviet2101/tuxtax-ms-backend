@@ -1,12 +1,15 @@
 import {Floor, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
+import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
+import parseFilters from "../../helpers/parseFilters.js";
 
 const getAllFloors = async ({
   page,
   limit,
   sortBy,
   order,
-  search
+  search,
+  filters
 }) => {
   const options = {};
   if (page) {
@@ -23,59 +26,48 @@ const getAllFloors = async ({
   if (search) {
     query.name = new RegExp(search, 'i');
   }
+  if (filters) {
+    parseFilters(query, filters);
+  }
 
   return await Floor.paginate(query, options);
 }
 
 const getFloorBySlug = async ({
   slug,
-  page,
-  limit,
-  sortBy,
-  order,
 }) => {
   const floor = await Floor.findById(slug?.split('-')?.at(-1)).lean();
   if (!floor) {
     throw new BadRequestError('floor_not_existed');
   }
 
-  const options = {};
-  if (page) {
-    options.page = parseInt(page);
-  }
-  if (limit) {
-    options.limit = parseInt(limit);
-  }
-  if (sortBy && order) {
-    options.sort = {[sortBy]: order};
-  }
-
-  const tables = await Table.paginate({floor: floor._id}, options);
-
-  return {
-    floor,
-    tables
-  };
+  return floor;
 }
 
 const createFloor = async ({
-  name
+  name,
+  active
 }) => {
   const floor = new Floor({
-    name
+    name,
+    active
   });
   return await floor.save();
 }
 
 const updateFloor = async ({
   id,
-  name
+  name,
+  active
 }) => {
+  const data = removeEmptyKeys({
+    name,
+    active
+  })
+
   const floor = await Floor.findOneAndUpdate({
     _id: id
-  }, {
-    name
-  }, {
+  }, data, {
     new: true
   });
   if (!floor) {

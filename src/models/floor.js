@@ -10,6 +10,10 @@ const FloorSchema = new mongoose.Schema({
   slug: {
     type: String,
   },
+  active: {
+    type: Boolean,
+    default: true
+  }
 }, {
   timestamps: true,
 });

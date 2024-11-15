@@ -7,19 +7,23 @@ const getAllFloors = catchAsync(async (req, res, next) => {
     limit: req?.query?.limit,
     sortBy: req?.query?.sortBy,
     order: req?.query?.order,
-    search: req?.query?.search
+    search: req?.query?.search,
+    filters: req?.query?.filters
   });
   res.json(data);
 })
 
 const getFloorBySlug = catchAsync(async (req, res, next) => {
-  const data = await FloorsService.getFloorBySlug(req?.params?.slug);
+  const data = await FloorsService.getFloorBySlug({
+    slug: req?.params?.slug,
+  });
   res.json(data);
 });
 
 const createFloor = catchAsync(async (req, res, next) => {
   const floor = await FloorsService.createFloor({
-    name: req?.body?.name
+    name: req?.body?.name,
+    active: req?.body?.active
   });
   res.status(201).json(floor);
 });
@@ -27,7 +31,8 @@ const createFloor = catchAsync(async (req, res, next) => {
 const updateFloor = catchAsync(async (req, res, next) => {
   const floor = await FloorsService.updateFloor({
     id: req?.params?.id,
-    name: req?.body?.name
+    name: req?.body?.name,
+    active: req?.body?.active
   });
   res.json(floor);
 });

@@ -71,12 +71,14 @@ const createCategory = async ({
   description,
   image,
   parent,
+  active
 }) => {
   return await Category.create({
     name,
     description,
     image,
-    parent
+    parent,
+    active
   });
 };
 
@@ -86,12 +88,14 @@ const updateCategory = async ({
   description,
   image,
   parent,
+  active
 }) => {
   const data = removeEmptyKeys({
     name,
     description,
     image,
     parent,
+    active
   });
   const res = await Category.findByIdAndUpdate(id, data, {new: true});
   if (!res) {

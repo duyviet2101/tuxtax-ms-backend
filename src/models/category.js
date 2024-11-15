@@ -24,6 +24,10 @@ const CategorySchema = new mongoose.Schema({
     ref: 'Category',
     default: null,
   },
+  active: {
+    type: Boolean,
+    default: true,
+  }
 }, {
   timestamps: true,
 });
