@@ -2,6 +2,7 @@ import {Category, Product} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
 import parseFilters from "../../helpers/parseFilters.js";
+import _ from "lodash";
 
 const getAllCategories = async ({
   page,
@@ -101,6 +102,15 @@ const updateCategory = async ({
   if (!res) {
     throw new BadRequestError('category_not_existed');
   }
+
+  if (_.isBoolean(active)) {
+    await Product.updateMany({
+      category: id
+    }, {
+      status: active ? 'available' : 'not_available'
+    });
+  }
+
   return res;
 };
 
@@ -116,11 +126,7 @@ const deleteCategory = async ({
     category: id
   });
   if (products.length > 0) {
-    await Product.updateMany({
-      category: id
-    }, {
-      category: null
-    });
+    throw new BadRequestError('category_has_products');
   }
 
   return res;
