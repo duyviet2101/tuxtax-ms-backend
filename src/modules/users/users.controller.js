@@ -25,6 +25,7 @@ const createUser = catchAsync(async (req, res, next) => {
     password: req?.body?.password,
     role: req?.body?.role,
     active: req?.body?.active,
+    phone: req?.body?.phone
   });
   res.status(201).json(data);
 })
@@ -36,6 +37,7 @@ const updateUser = catchAsync(async (req, res, next) => {
     name: req?.body?.name,
     role: req?.body?.role,
     active: req?.body?.active,
+    phone: req?.body?.phone
   });
   res.json(data);
 })
