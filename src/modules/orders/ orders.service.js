@@ -1,4 +1,4 @@
-import {Order, Product, Table} from "../../models/index.js";
+import {Floor, Order, Product, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import parseFilters from "../../helpers/parseFilters.js";
 
@@ -61,7 +61,10 @@ const getOrders = async ({
 const getOrderById = async ({
   id,
 }) => {
-  const order = await Order.findById(id);
+  const order = await Order.findById(id).lean({autopopulate: true});
+
+  const floor = await Floor.findById(order.table.floor).lean();
+  order.table.floor = floor;
 
   if (!order) {
     throw new BadRequestError("order_not_existed");

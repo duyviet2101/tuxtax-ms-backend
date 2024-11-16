@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import mongooseAutoPopulate from "mongoose-autopopulate";
 import paginate from "mongoose-paginate-v2";
+import {Table} from "./index.js";
+import moment from "moment";
+import slugify from "slugify";
 
 const OrderSchema = new mongoose.Schema({
   table: {
@@ -28,7 +31,7 @@ const OrderSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ['pending', 'completed'],
+      enum: ['pending', 'cooking', 'completed'],
       default: 'pending'
     }
   }],
@@ -45,8 +48,19 @@ const OrderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  billCode: {
+    type: String,
+  }
 }, {
   timestamps: true,
+});
+
+OrderSchema.pre("save", async function (next) {
+  if (!this.billCode) {
+    const table = await Table.findById(this.table);
+    this.billCode = `B${moment().format("DDMMYYYY-HHmm")}-${slugify(table.name, {lower: false})}`;
+  }
+  next();
 });
 
 OrderSchema.plugin(mongooseAutoPopulate);

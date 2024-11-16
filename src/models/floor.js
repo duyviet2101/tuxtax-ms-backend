@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import slugify from "slugify";
 import paginate from "mongoose-paginate-v2";
 
 const FloorSchema = new mongoose.Schema({
@@ -9,6 +8,7 @@ const FloorSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
+    unique: true, // Đảm bảo tính duy nhất ở mức cơ sở dữ liệu
   },
   active: {
     type: Boolean,
@@ -18,18 +18,44 @@ const FloorSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Tạo slug tự động từ name trước khi lưu
-FloorSchema.pre("save", function (next) {
+function generateSlugFromName(name) {
+  if (!name) return '';
+  return name
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase())
+    .join('');
+}
+
+async function ensureUniqueSlug(model, slug, id) {
+  let uniqueSlug = slug;
+  let count = 1;
+
+  while (true) {
+    const existing = await model.findOne({ slug: uniqueSlug, _id: { $ne: id } });
+    if (!existing) break;
+    uniqueSlug = `${slug}_${count}`;
+    count++;
+  }
+
+  return uniqueSlug;
+}
+
+FloorSchema.pre("save", async function (next) {
   if (!this.slug) {
-    this.slug = slugify(`${this.name} ${this._id}`, { lower: true, locale: 'vi' });
+    const baseSlug = generateSlugFromName(this.name);
+    this.slug = await ensureUniqueSlug(mongoose.models.Floor, baseSlug, this._id);
   }
   next();
 });
 
-FloorSchema.post(["findOneAndUpdate"], function (doc) {
+FloorSchema.post("findOneAndUpdate", async function (doc) {
   if (doc) {
-    doc.slug = slugify(`${doc?.name} ${doc?._id}`, { lower: true, locale: 'vi' });
-    return doc.save();
+    const baseSlug = generateSlugFromName(doc.name);
+    const uniqueSlug = await ensureUniqueSlug(mongoose.models.Floor, baseSlug, doc._id);
+    if (doc.slug !== uniqueSlug) {
+      doc.slug = uniqueSlug;
+      await doc.save();
+    }
   }
 });
 
