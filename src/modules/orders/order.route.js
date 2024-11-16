@@ -137,7 +137,7 @@ router.post("/", OrdersController.createOrder);
  *       '400':
  *         description: order_not_existed
  */
-router.patch("/:id/status", userMiddleware, OrdersController.updateStatusOrder);
+router.patch("/:id", userMiddleware, OrdersController.updateStatusOrder);
 
 /**
  * @swagger

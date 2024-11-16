@@ -33,6 +33,7 @@ const updateStatusOrder = catchAsync(async (req, res, next) => {
   const data = await OrdersService.updateStatusOrder({
     id: req?.params?.id,
     status: req?.body?.status,
+    table: req?.body?.table,
   });
   res.json(data);
 });
