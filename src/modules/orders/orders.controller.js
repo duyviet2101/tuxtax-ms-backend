@@ -41,6 +41,7 @@ const updateQuantityProduct = catchAsync(async (req, res, next) => {
   const data = await OrdersService.updateQuantityProduct({
     id: req?.params?.id,
     product: req?.body?.product,
+    option: req?.body?.option,
     quantity: req?.body?.quantity,
     price: req?.body?.price,
     status: req?.body?.status,
@@ -52,6 +53,7 @@ const deleteProductInOrder = catchAsync(async (req, res, next) => {
   const data = await OrdersService.deleteProductInOrder({
     id: req?.params?.id,
     product: req?.params?.productId,
+    option: req?.query?.option,
   });
   res.json(data);
 });
