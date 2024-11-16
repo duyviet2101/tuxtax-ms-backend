@@ -11,6 +11,7 @@ const createProduct = catchAsync(async (req, res, next) => {
     category: data?.category,
     quantity: data?.quantity,
     status: data?.status,
+    options: data?.options,
   });
   res.status(201).json(product);
 });
@@ -45,6 +46,7 @@ const updateProduct = catchAsync(async (req, res, next) => {
     category: data?.category,
     quantity: data?.quantity,
     status: data?.status,
+    options: data?.options,
   });
   res.json(product);
 });

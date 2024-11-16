@@ -5,6 +5,8 @@ import parseFilters from "../../helpers/parseFilters.js";
 const createOrder = async ({
   table,
   products,
+  name,
+  phone
 }) => {
   const tableExist = await Table.findById(table);
   if (!tableExist) {
@@ -16,9 +18,11 @@ const createOrder = async ({
     if (!productExist) {
       throw new BadRequestError(`product_${item.product}_not_existed`);
     }
+    productExist.quantity -= item.quantity;
+    productExist.sells += item.quantity;
+    await productExist.save();
   }
 
-  // Calculate total
   const total = products.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
@@ -27,6 +31,8 @@ const createOrder = async ({
     table,
     products,
     total,
+    name: name ? name : "Khách lẻ",
+    phone: phone ? phone : "N/A"
   });
 
   return order;
@@ -103,8 +109,13 @@ const deleteOrder = async ({
 const updateQuantityProduct = async ({
   id,
   product,
-  newQuantity
+  quantity,
+  price,
+  status
 }) => {
+  if (!quantity && !price && !status) {
+    return;
+  }
   const order = await Order.findById(id, {}, {autopopulate: false});
   if (!order) {
     throw new BadRequestError("order_not_existed");
@@ -114,8 +125,15 @@ const updateQuantityProduct = async ({
   if (productIndex === -1) {
     throw new BadRequestError("product_not_existed");
   }
-
-  order.products[productIndex].quantity = newQuantity;
+  if (quantity) {
+    order.products[productIndex].quantity = quantity;
+  }
+  if (price) {
+    order.products[productIndex].price = price;
+  }
+  if (status) {
+    order.products[productIndex].status = status;
+  }
 
   //cal total
   order.total = order.products.reduce((acc, item) => {
@@ -134,7 +152,6 @@ const deleteProductInOrder = async ({
   if (!order) {
     throw new BadRequestError("order_not_existed");
   }
-
   const productIndex = order.products.findIndex(item => item.product.toString() === product);
   if (productIndex === -1) {
     throw new BadRequestError("product_not_existed");
@@ -154,7 +171,8 @@ const deleteProductInOrder = async ({
 const addProductToOrder = async ({
   id,
   product,
-  quantity
+  quantity,
+  option
 }) => {
   const order = await Order.findById(id, {}, {autopopulate: false});
   if (!order) {
@@ -168,14 +186,23 @@ const addProductToOrder = async ({
 
   const productIndex = order.products.findIndex(item => item.product.toString() === product);
   if (productIndex !== -1) {
-    order.products[productIndex].quantity = quantity;
+    order.products[productIndex].quantity += parseInt(quantity);
   } else {
     order.products.push({
       product,
       quantity,
+      option,
       price: productExist.price,
     });
   }
+
+  //cal total
+  order.total = order.products.reduce((acc, item) => {
+    return acc + item.price * item.quantity;
+  }, 0);
+
+  await order.save();
+  return order;
 }
 
 const updateIsPaidOrder = async ({
@@ -184,6 +211,23 @@ const updateIsPaidOrder = async ({
 }) => {
   const order = await Order.findByIdAndUpdate(id, {
     isPaid
+  }, {
+    new: true
+  });
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+  return order;
+}
+
+const updateInfoOrder = async ({
+  id,
+  name,
+  phone
+}) => {
+  const order = await Order.findByIdAndUpdate(id, {
+    name,
+    phone
   }, {
     new: true
   });
@@ -202,5 +246,6 @@ export default {
   updateQuantityProduct,
   deleteProductInOrder,
   addProductToOrder,
-  updateIsPaidOrder
+  updateIsPaidOrder,
+  updateInfoOrder
 };

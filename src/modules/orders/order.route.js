@@ -47,7 +47,7 @@ const router = Router();
  *       '401':
  *         description: Unauthorized access
  */
-router.get("/", userMiddleware, adminMiddleware, OrdersController.getOrders);
+router.get("/", userMiddleware, OrdersController.getOrders);
 
 /**
  * @swagger
@@ -70,7 +70,7 @@ router.get("/", userMiddleware, adminMiddleware, OrdersController.getOrders);
  *       '404':
  *         description: Order not found
  */
-router.get("/:id", userMiddleware, adminMiddleware, OrdersController.getOrderById);
+router.get("/:id", userMiddleware, OrdersController.getOrderById);
 
 /**
  * @swagger
@@ -137,7 +137,7 @@ router.post("/", OrdersController.createOrder);
  *       '400':
  *         description: order_not_existed
  */
-router.patch("/:id/status", userMiddleware, adminMiddleware, OrdersController.updateStatusOrder);
+router.patch("/:id/status", userMiddleware, OrdersController.updateStatusOrder);
 
 /**
  * @swagger
@@ -169,7 +169,7 @@ router.patch("/:id/status", userMiddleware, adminMiddleware, OrdersController.up
  *       '400':
  *         description: order_not_existed, product_not_existed
  */
-router.patch("/:id/products", userMiddleware, adminMiddleware, OrdersController.updateQuantityProduct);
+router.patch("/:id/products", userMiddleware, OrdersController.updateQuantityProduct);
 
 /**
  * @swagger
@@ -196,7 +196,7 @@ router.patch("/:id/products", userMiddleware, adminMiddleware, OrdersController.
  *       '400':
  *         description: order_not_existed, product_not_existed
  */
-router.delete("/:id/products/:productId", userMiddleware, adminMiddleware, OrdersController.deleteProductInOrder);
+router.delete("/:id/products/:productId", userMiddleware, OrdersController.deleteProductInOrder);
 
 /**
  * @swagger
@@ -249,7 +249,7 @@ router.delete("/:id", userMiddleware, adminMiddleware, OrdersController.deleteOr
  *       '400':
  *         description: order_not_existed, product_not_existed
  */
-router.post("/:id/products", userMiddleware, adminMiddleware, OrdersController.addProductToOrder);
+router.post("/:id/products", userMiddleware, OrdersController.addProductToOrder);
 
 /**
  * @swagger
@@ -279,6 +279,8 @@ router.post("/:id/products", userMiddleware, adminMiddleware, OrdersController.a
  *       '400':
  *         description: order_not_existed
  */
-router.patch("/:id/is-paid", userMiddleware, adminMiddleware, OrdersController.updateIsPaidOrder);
+router.patch("/:id/is-paid", userMiddleware, OrdersController.updateIsPaidOrder);
+
+router.patch("/:id/info", userMiddleware, OrdersController.updateInfoOrder)
 
 export default router;

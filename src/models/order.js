@@ -6,6 +6,14 @@ import moment from "moment";
 import slugify from "slugify";
 
 const OrderSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  phone: {
+    type: String,
+    required: true
+  },
   table: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Table',
@@ -20,6 +28,14 @@ const OrderSchema = new mongoose.Schema({
         select: "_id slug name image"
       },
       required: true
+    },
+    option: {
+      type: String,
+      default: ''
+    },
+    note: {
+      type: String,
+      default: ''
     },
     quantity: {
       type: Number,

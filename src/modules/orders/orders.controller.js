@@ -5,6 +5,8 @@ const createOrder = catchAsync(async (req, res, next) => {
   const data = await OrdersService.createOrder({
     table: req?.body?.table,
     products: req?.body?.products,
+    name: req?.body?.name,
+    phone: req?.body?.phone,
   });
   res.status(201).json(data);
 });
@@ -27,7 +29,7 @@ const getOrderById = catchAsync(async (req, res, next) => {
   res.json(data);
 });
 
-const updateStatusOrder = catchAsync(async (req, rest, next) => {
+const updateStatusOrder = catchAsync(async (req, res, next) => {
   const data = await OrdersService.updateStatusOrder({
     id: req?.params?.id,
     status: req?.body?.status,
@@ -40,6 +42,8 @@ const updateQuantityProduct = catchAsync(async (req, res, next) => {
     id: req?.params?.id,
     product: req?.body?.product,
     quantity: req?.body?.quantity,
+    price: req?.body?.price,
+    status: req?.body?.status,
   });
   res.json(data);
 });
@@ -64,6 +68,7 @@ const addProductToOrder = catchAsync(async (req, res, next) => {
     id: req?.params?.id,
     product: req?.body?.product,
     quantity: req?.body?.quantity,
+    option: req?.body?.option,
   });
   res.json(data);
 });
@@ -72,6 +77,15 @@ const updateIsPaidOrder = catchAsync(async (req, res, next) => {
   const data = await OrdersService.updateIsPaidOrder({
     id: req?.params?.id,
     isPaid: req?.body?.isPaid,
+  });
+  res.json(data);
+});
+
+const updateInfoOrder = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.updateInfoOrder({
+    id: req?.params?.id,
+    name: req?.body?.name,
+    phone: req?.body?.phone,
   });
   res.json(data);
 });
@@ -85,5 +99,6 @@ export default {
   deleteProductInOrder,
   deleteOrder,
   updateIsPaidOrder,
-  addProductToOrder
+  addProductToOrder,
+  updateInfoOrder
 }

@@ -4,6 +4,7 @@ export const PRODUCT_FIELDS = [
   "name",
   "price",
   "image",
+  "options",
   "description",
   "quantity",
   "category",
