@@ -93,6 +93,23 @@ const updateInfoOrder = catchAsync(async (req, res, next) => {
   res.json(data);
 });
 
+const splitTable = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.splitTable({
+    id: req?.params?.id,
+    to: req?.body?.to,
+    products: req?.body?.products,
+  });
+  res.json(data);
+});
+
+const mergeTable = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.mergeTable({
+    id: req?.params?.id,
+    from: req?.body?.from,
+  });
+  res.json(data);
+});
+
 export default {
   createOrder,
   getOrders,
@@ -103,5 +120,7 @@ export default {
   deleteOrder,
   updateIsPaidOrder,
   addProductToOrder,
-  updateInfoOrder
+  updateInfoOrder,
+  splitTable,
+  mergeTable
 }

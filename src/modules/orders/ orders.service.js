@@ -7,11 +7,21 @@ const createOrder = async ({
   table,
   products,
   name,
-  phone
+  phone,
+  isSplit = false
 }) => {
   const tableExist = await Table.findById(table);
   if (!tableExist) {
     throw new BadRequestError("table_not_existed");
+  }
+  const orderExist = await Order.findOne({
+    table,
+    status: {
+      $in: ["pending"]
+    }
+  });
+  if (orderExist) {
+    throw new BadRequestError("table_has_order_pending");
   }
 
   for (const item of products) {
@@ -19,10 +29,12 @@ const createOrder = async ({
     if (!productExist) {
       throw new BadRequestError(`product_${item.product}_not_existed`);
     }
-    if (productExist.quantity < item.quantity) {
-      throw new BadRequestError(`product_${item.product}_quantity_not_enough`);
+    if (!isSplit) {
+      if (productExist.quantity < item.quantity) {
+        throw new BadRequestError(`product_${item.product}_quantity_not_enough`);
+      }
+      productExist.quantity -= item.quantity;
     }
-    productExist.quantity -= item.quantity;
     await productExist.save();
   }
 
@@ -283,6 +295,83 @@ const updateInfoOrder = async ({
   return order;
 }
 
+const splitTable = async ({
+  id,
+  to,
+  products = []
+}) => {
+  const order = await Order.findById(id, {}, {autopopulate: false});
+  const tableTo = await Table.findById(to);
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+  if (!tableTo) {
+    throw new BadRequestError("table_not_existed");
+  }
+
+  const productsSplit = order.products.filter(item => products.includes(item._id.toString()));
+
+  const res = await createOrder({
+    table: to,
+    products: productsSplit,
+    name: order.name,
+    phone: order.phone,
+    isSplit: true
+  })
+
+  order.products = order.products.filter(item => !products.includes(item._id.toString()));
+  order.total = order.products.reduce((acc, item) => {
+    return acc + item.price * item.quantity;
+  }, 0);
+
+  if (order.products.length === 0) {
+    await Order.findByIdAndDelete(order._id);
+  } else {
+    await order.save();
+  }
+
+
+  return res;
+}
+
+const mergeTable = async ({
+  id,
+  from
+}) => {
+  const order = await Order.findById(id, {}, {autopopulate: false});
+  const tableFrom = await Table.findById(from);
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+  if (!tableFrom) {
+    throw new BadRequestError("table_not_existed");
+  }
+
+  const orderFrom = await Order.findOne({
+    table: from
+  }, {}, {autopopulate: false});
+  if (!orderFrom) {
+    throw new BadRequestError("order_not_existed");
+  }
+
+  orderFrom.products.forEach(item => {
+    const productIndex = order.products.findIndex(product => product.product.toString() === item.product.toString() && product.option === item.option);
+    if (productIndex !== -1) {
+      order.products[productIndex].quantity += item.quantity;
+    } else {
+      order.products.push(item);
+    }
+  });
+
+  order.total = order.products.reduce((acc, item) => {
+    return acc + item.price * item.quantity;
+  }, 0);
+
+  await order.save();
+  await Order.findByIdAndDelete(orderFrom._id);
+  return order;
+}
+
 export default {
   createOrder,
   getOrders,
@@ -293,5 +382,7 @@ export default {
   deleteProductInOrder,
   addProductToOrder,
   updateIsPaidOrder,
-  updateInfoOrder
+  updateInfoOrder,
+  splitTable,
+  mergeTable
 };

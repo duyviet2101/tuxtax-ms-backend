@@ -283,4 +283,8 @@ router.patch("/:id/is-paid", userMiddleware, OrdersController.updateIsPaidOrder)
 
 router.patch("/:id/info", userMiddleware, OrdersController.updateInfoOrder)
 
+router.patch("/:id/split", userMiddleware, OrdersController.splitTable);
+
+router.patch("/:id/merge", userMiddleware, OrdersController.mergeTable);
+
 export default router;
