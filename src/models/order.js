@@ -64,6 +64,10 @@ const OrderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  paidAt: {
+    type: Date,
+    default: null
+  },
   billCode: {
     type: String,
   }
@@ -75,6 +79,17 @@ OrderSchema.pre("save", async function (next) {
   if (!this.billCode) {
     const table = await Table.findById(this.table);
     this.billCode = `B${moment().format("DDMMYYYY-HHmm")}-${slugify(table.name, {lower: false})}`;
+  }
+  //cal total
+  if (!this.total) this.total = 0;
+  this.total = this.products.reduce((acc, item) => {
+    return acc + item.price * item.quantity;
+  }, 0);
+  //cal status
+  if (this?.products?.every(item => item.status === 'completed')) {
+    this.status = 'completed';
+  } else {
+    this.status = 'pending';
   }
   next();
 });

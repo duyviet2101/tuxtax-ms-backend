@@ -41,7 +41,7 @@ const getAllTables = async ({
   for (const table of tables.docs) {
     const order = await Order.findOne({
       table: table._id,
-      status: 'pending'
+      $or: [{status: 'pending'}, {isPaid: false}]
     });
     if (order) {
       table.order = order;

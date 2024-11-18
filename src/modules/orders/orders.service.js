@@ -1,7 +1,6 @@
 import {Floor, Order, Product, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import parseFilters from "../../helpers/parseFilters.js";
-import {removeEmptyKeys} from "../../helpers/lodashFuncs.js";
 
 const createOrder = async ({
   table,
@@ -42,13 +41,15 @@ const createOrder = async ({
     return acc + item.price * item.quantity;
   }, 0);
 
-  const order = await Order.create({
+  const order = new Order({
     table,
     products,
     total,
     name: name ? name : "Khách lẻ",
     phone: phone ? phone : "N/A"
   });
+
+  await order.save();
 
   return order;
 }
@@ -58,9 +59,14 @@ const getOrders = async ({
   limit,
   sortBy,
   order,
-  filters
+  filters,
+  from,
+  to,
+  search
 }) => {
-  const options = {};
+  const options = {
+    autopopulate: false,
+  };
   if (page) {
     options.page = parseInt(page);
   }
@@ -75,8 +81,30 @@ const getOrders = async ({
   if (filters) {
     parseFilters(queries, filters);
   }
+  if (from) {
+    queries.createdAt = {
+      $gte: new Date(from).setHours(0, 0, 0, 0)
+    };
+  }
+  if (to) {
+    queries.createdAt = {
+      ...queries.createdAt,
+      $lte: new Date(to).setHours(23, 59, 59, 999)
+    };
+  }
+  if (search) {
+    queries.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { phone: { $regex: search, $options: "i" } }
+    ];
+  }
 
-  return await Order.paginate(queries, options);
+  const orders = await Order.paginate(queries, options);
+  for (const order of orders.docs) {
+    order.table = await Table.findById(order.table).populate("floor");
+  }
+
+  return orders;
 }
 
 const getOrderById = async ({
@@ -99,22 +127,29 @@ const updateStatusOrder = async ({
   status,
   table
 }) => {
-  const data = removeEmptyKeys({
-    status,
-    table
-  });
-  if (!data) {
-    throw new BadRequestError("data_required");
-  }
-
-  const order = await Order.findOneAndUpdate({
-    _id: id
-  }, data, {
-    new: true
-  });
+  const order = await Order.findById(id);
   if (!order) {
     throw new BadRequestError("order_not_existed");
   }
+
+  if (table) {
+    const tableExist = await Table.findById(table);
+    if (!tableExist) {
+      throw new BadRequestError("table_not_existed");
+    }
+    order.table = table;
+  }
+
+  if (status) {
+    order.status = status;
+    if (status === "completed") {
+      for (const item of order.products) {
+        item.status = "completed";
+      }
+    }
+  }
+
+  await order.save();
   return order;
 }
 
@@ -177,9 +212,9 @@ const updateQuantityProduct = async ({
   }
 
   //cal total
-  order.total = order.products.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0);
+  // order.total = order.products.reduce((acc, item) => {
+  //   return acc + item.price * item.quantity;
+  // }, 0);
 
   await order.save();
   return order;
@@ -208,9 +243,9 @@ const deleteProductInOrder = async ({
   order.products.splice(productIndex, 1);
 
   //cal total
-  order.total = order.products.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0);
+  // order.total = order.products.reduce((acc, item) => {
+  //   return acc + item.price * item.quantity;
+  // }, 0);
 
   await order.save();
   return order;
@@ -255,9 +290,9 @@ const addProductToOrder = async ({
   }
 
   //cal total
-  order.total = order.products.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0);
+  // order.total = order.products.reduce((acc, item) => {
+  //   return acc + item.price * item.quantity;
+  // }, 0);
 
   await order.save();
   return order;
@@ -268,7 +303,8 @@ const updateIsPaidOrder = async ({
   isPaid
 }) => {
   const order = await Order.findByIdAndUpdate(id, {
-    isPaid
+    isPaid,
+    paidAt: isPaid ? new Date() : null
   }, {
     new: true
   });
@@ -320,9 +356,9 @@ const splitTable = async ({
   })
 
   order.products = order.products.filter(item => !products.includes(item._id.toString()));
-  order.total = order.products.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0);
+  // order.total = order.products.reduce((acc, item) => {
+  //   return acc + item.price * item.quantity;
+  // }, 0);
 
   if (order.products.length === 0) {
     await Order.findByIdAndDelete(order._id);
@@ -363,9 +399,9 @@ const mergeTable = async ({
     }
   });
 
-  order.total = order.products.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0);
+  // order.total = order.products.reduce((acc, item) => {
+  //   return acc + item.price * item.quantity;
+  // }, 0);
 
   await order.save();
   await Order.findByIdAndDelete(orderFrom._id);

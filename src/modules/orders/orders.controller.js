@@ -1,5 +1,5 @@
 import catchAsync from "../../utils/catchAsync.js";
-import OrdersService from "./ orders.service.js";
+import OrdersService from "./orders.service.js";
 
 const createOrder = catchAsync(async (req, res, next) => {
   const data = await OrdersService.createOrder({
@@ -17,7 +17,10 @@ const getOrders = catchAsync(async (req, res, next) => {
     limit: req?.query?.limit,
     sortBy: req?.query?.sortBy,
     order: req?.query?.order,
-    fitlers: req?.query?.filters,
+    filters: req?.query?.filters,
+    from: req?.query?.from,
+    to: req?.query?.to,
+    search: req?.query?.search,
   });
   res.json(data);
 });
