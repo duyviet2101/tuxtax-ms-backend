@@ -15,9 +15,10 @@ const createOrder = async ({
   }
   const orderExist = await Order.findOne({
     table,
-    status: {
-      $in: ["pending"]
-    }
+    $or: [
+      { status: "pending" },
+      { isPaid: false }
+    ]
   });
   if (orderExist) {
     throw new BadRequestError("table_has_order_pending");
@@ -65,7 +66,9 @@ const getOrders = async ({
   search
 }) => {
   const options = {
-    autopopulate: false,
+    lean: {
+      autopopulate: true
+    }
   };
   if (page) {
     options.page = parseInt(page);
@@ -100,8 +103,25 @@ const getOrders = async ({
   }
 
   const orders = await Order.paginate(queries, options);
+
+
+  const uniqueProducts = {};
   for (const order of orders.docs) {
     order.table = await Table.findById(order.table).populate("floor");
+
+    for (const product of order.products) {
+      if (!uniqueProducts[product.product._id + "-" + product.option]) {
+        uniqueProducts[product.product._id + "-" + product.option] = product.quantity;
+      } else {
+        uniqueProducts[product.product._id + "-" + product.option] += product.quantity;
+      }
+    }
+  }
+
+  for (const order of orders.docs) {
+    for (const product of order.products) {
+      product.totalAll = uniqueProducts[product.product._id + "-" + product.option];
+    }
   }
 
   return orders;
