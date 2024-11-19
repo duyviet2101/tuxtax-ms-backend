@@ -74,7 +74,7 @@ router.get("/", userMiddleware, TableController.getAllTables);
  *       '400':
  *         description: table_not_existed
  */
-router.get("/:id", userMiddleware, TableController.getTableById);
+router.get("/:id", TableController.getTableById);
 
 /**
  * @swagger
