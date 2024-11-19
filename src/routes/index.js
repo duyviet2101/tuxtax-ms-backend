@@ -8,6 +8,7 @@ import FloorsRoute from "../modules/floors/floors.route.js";
 import TablesRoute from "../modules/tables/tables.route.js";
 import OrderRoute from "../modules/orders/order.route.js";
 import UploadRoute from "../modules/upload/upload.route.js";
+import DashboardRoute from "../modules/dashboard/dashboard.route.js";
 
 const router = express.Router();
 
@@ -28,5 +29,7 @@ router.use('/tables', TablesRoute);
 router.use('/orders', OrderRoute);
 
 router.use('/upload', UploadRoute);
+
+router.use('/dashboard', DashboardRoute);
 
 export default router;

@@ -1,6 +1,7 @@
 import {Floor, Order, Product, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import parseFilters from "../../helpers/parseFilters.js";
+import moment from "moment";
 
 const createOrder = async ({
   table,
@@ -86,13 +87,15 @@ const getOrders = async ({
   }
   if (from) {
     queries.createdAt = {
-      $gte: new Date(from).setHours(0, 0, 0, 0)
+      // $gte: new Date(from).setHours(0, 0, 0, 0)
+      $gte: moment(from).startOf("day").toDate()
     };
   }
   if (to) {
     queries.createdAt = {
       ...queries.createdAt,
-      $lte: new Date(to).setHours(23, 59, 59, 999)
+      // $lte: new Date(to).setHours(23, 59, 59, 999)
+      $lte: moment(to).endOf("day").toDate()
     };
   }
   if (search) {
@@ -326,8 +329,21 @@ const updateIsPaidOrder = async ({
     isPaid,
     paidAt: isPaid ? new Date() : null
   }, {
-    new: true
+    new: true,
   });
+
+  if (isPaid) {
+    for (const item of order.products) {
+      await Product.findByIdAndUpdate(item.product._id, {
+        $inc: {
+          sells: item.quantity
+        }
+      }, {
+        new: true
+      });
+    }
+  }
+
   if (!order) {
     throw new BadRequestError("order_not_existed");
   }

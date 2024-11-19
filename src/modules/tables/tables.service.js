@@ -82,7 +82,7 @@ const createTable = async ({
     name,
     floor,
     capacity,
-    active
+    active: active && floorExists.active
   });
 }
 
