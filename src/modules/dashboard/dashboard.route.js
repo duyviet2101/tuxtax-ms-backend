@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/income", userMiddleware, adminMiddleware, DashboardController.getIncome);
 
-router.get("/best-seller", userMiddleware, adminMiddleware, DashboardController.getBestSeller);
+router.get("/best-seller", DashboardController.getBestSeller);
 
 export default router;

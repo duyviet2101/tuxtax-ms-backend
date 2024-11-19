@@ -12,7 +12,9 @@ const getAllCategories = async ({
   search,
   filters
 }) => {
-  const options = {};
+  const options = {
+    lean: true
+  };
   if (page) {
     options.page = parseInt(page);
   }
@@ -31,7 +33,11 @@ const getAllCategories = async ({
     parseFilters(queries, filters);
   }
 
-  return await Category.paginate(queries, options);
+  const categories = await Category.paginate(queries, options);
+  for (const category of categories.docs) {
+    category.products = await Product.find({category: category._id}).countDocuments();
+  }
+  return categories;
 }
 
 const getCategoryByIdOrSlug = async ({

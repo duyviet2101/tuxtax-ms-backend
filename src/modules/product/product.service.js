@@ -44,7 +44,7 @@ const getAllProducts = async ({
     queries.name = { $regex: search, $options: "i" };
   }
   if (category) {
-    queries.category = category;
+    queries.category = category.split("-").at(-1);
   }
   if (filters) {
     parseFilters(queries, filters);
