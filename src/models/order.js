@@ -70,6 +70,21 @@ const OrderSchema = new mongoose.Schema({
   },
   billCode: {
     type: String,
+  },
+  discounts: [{
+    reason: {
+      type: String,
+      required: true
+    },
+    value: {
+      type: Number,
+      required: true
+    }
+  }],
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'failed'],
+    default: 'pending'
   }
 }, {
   timestamps: true,
@@ -82,9 +97,14 @@ OrderSchema.pre("save", async function (next) {
   }
   //cal total
   if (!this.total) this.total = 0;
-  this.total = this.products.reduce((acc, item) => {
+  const total = this.products.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
+  const discount = this.discounts?.reduce((acc, item) => {
+    return acc + item.value;
+  }, 0) || 0;
+  this.total = total - discount;
+
   //cal status
   if (this?.products?.every(item => item.status === 'completed')) {
     this.status = 'completed';

@@ -287,4 +287,6 @@ router.patch("/:id/split", userMiddleware, OrdersController.splitTable);
 
 router.patch("/:id/merge", userMiddleware, OrdersController.mergeTable);
 
+router.patch("/:id/discounts", userMiddleware, OrdersController.addDiscountToOrder);
+
 export default router;

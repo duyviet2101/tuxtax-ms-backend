@@ -19,6 +19,10 @@ const config = {
   CLOUD_NAME: process.env.CLOUD_NAME || '',
   CLOUD_KEY: process.env.CLOUD_KEY || '',
   CLOUD_SECRET: process.env.CLOUD_SECRET || '',
+  vnp_TmnCode: process.env.vnp_TmnCode || '',
+  vnp_HashSecret: process.env.vnp_HashSecret || '',
+  vnp_Url: process.env.vnp_Url || '',
+  vnp_ReturnUrl: process.env.vnp_ReturnUrl || '',
 }
 
 export default config;

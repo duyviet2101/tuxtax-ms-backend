@@ -444,6 +444,28 @@ const mergeTable = async ({
   return order;
 }
 
+const addDiscountToOrder = async ({
+  id,
+  reason,
+  value
+}) => {
+  const order = await Order.findById(id);
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+
+  if (!order.discounts) {
+    order.discounts = [];
+  }
+  order.discounts.push({
+    reason,
+    value
+  });
+
+  await order.save();
+  return order;
+}
+
 export default {
   createOrder,
   getOrders,
@@ -456,5 +478,6 @@ export default {
   updateIsPaidOrder,
   updateInfoOrder,
   splitTable,
-  mergeTable
+  mergeTable,
+  addDiscountToOrder
 };

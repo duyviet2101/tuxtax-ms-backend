@@ -113,6 +113,15 @@ const mergeTable = catchAsync(async (req, res, next) => {
   res.json(data);
 });
 
+const addDiscountToOrder = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.addDiscountToOrder({
+    id: req?.params?.id,
+    reason: req?.body?.reason,
+    value: req?.body?.value,
+  });
+  res.json(data);
+});
+
 export default {
   createOrder,
   getOrders,
@@ -125,5 +134,6 @@ export default {
   addProductToOrder,
   updateInfoOrder,
   splitTable,
-  mergeTable
+  mergeTable,
+  addDiscountToOrder
 }

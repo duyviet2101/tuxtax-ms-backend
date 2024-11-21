@@ -9,6 +9,7 @@ import TablesRoute from "../modules/tables/tables.route.js";
 import OrderRoute from "../modules/orders/order.route.js";
 import UploadRoute from "../modules/upload/upload.route.js";
 import DashboardRoute from "../modules/dashboard/dashboard.route.js";
+import CheckoutRoute from "../modules/checkout/checkout.route.js";
 
 const router = express.Router();
 
@@ -31,5 +32,7 @@ router.use('/orders', OrderRoute);
 router.use('/upload', UploadRoute);
 
 router.use('/dashboard', DashboardRoute);
+
+router.use('/checkout', CheckoutRoute);
 
 export default router;
