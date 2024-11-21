@@ -30,4 +30,8 @@ jobs:
           echo "CLOUD_NAME=${{ secrets.CLOUD_NAME }}" >> .env
           echo "CLOUD_KEY=${{ secrets.CLOUD_KEY }}" >> .env
           echo "CLOUD_SECRET=${{ secrets.CLOUD_SECRET }}" >> .env
+          echo "vnp_TmnCode=${{ secrets.vnp_TmnCode }}" >> .env
+          echo "vnp_HashSecret=${{ secrets.vnp_HashSecret }}" >> .env
+          echo "vnp_Url=${{ secrets.vnp_Url }}" >> .env
+          echo "vnp_ReturnUrl=${{ secrets.vnp_ReturnUrl }}" >> .env
       - run: pm2 restart tuxtax-backend

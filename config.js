@@ -22,7 +22,7 @@ const config = {
   vnp_TmnCode: process.env.vnp_TmnCode || '',
   vnp_HashSecret: process.env.vnp_HashSecret || '',
   vnp_Url: process.env.vnp_Url || '',
-  vnp_ReturnUrl: process.env.vnp_ReturnUrl || '',
+  vnp_ReturnUrl: process.env.vnp_ReturnUrl || 'http://localhost:5173/success',
 }
 
 export default config;
