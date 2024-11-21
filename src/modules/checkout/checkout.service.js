@@ -35,7 +35,7 @@ const createPaymentUrl = async (req) => {
   // console.log(TxnRef);
   const amount = order.total;
 
-  const orderInfo = `Thanh toán hoá đơn bàn ${order?.table?.name}. Thành tiền: ${amount} VNĐ`;
+  const orderInfo = `Thanh toan hoa don ban ${order?.table?.name}. Thanh tien: ${amount} VNĐ`;
   const orderType = "100000";
   let locale = req.body.language;
   if(!locale){
