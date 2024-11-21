@@ -70,7 +70,7 @@ router.get("/", userMiddleware, OrdersController.getOrders);
  *       '404':
  *         description: Order not found
  */
-router.get("/:id", userMiddleware, OrdersController.getOrderById);
+router.get("/:id", OrdersController.getOrderById);
 
 /**
  * @swagger
