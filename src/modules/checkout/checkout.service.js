@@ -16,7 +16,7 @@ const createPaymentUrl = async (req) => {
   const tmnCode = config.vnp_TmnCode;
   const secretKey = config.vnp_HashSecret;
   let vnpUrl = config.vnp_Url;
-  const returnUrl = config.vnp_ReturnUrl;
+  const returnUrl = req?.body?.returnUrl || config.vnp_ReturnUrl;
 
   const date = new Date();
   const orderId = req.body.orderId;
