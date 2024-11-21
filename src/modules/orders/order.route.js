@@ -289,4 +289,6 @@ router.patch("/:id/merge", userMiddleware, OrdersController.mergeTable);
 
 router.patch("/:id/discounts", userMiddleware, OrdersController.addDiscountToOrder);
 
+router.delete("/:id/discounts/:discountId", userMiddleware, OrdersController.removeDiscountFromOrder);
+
 export default router;

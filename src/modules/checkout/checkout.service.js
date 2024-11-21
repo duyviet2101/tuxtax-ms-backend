@@ -30,7 +30,7 @@ const createPaymentUrl = async (req) => {
   }
 
   const createDate = dateFormat(date, 'yyyymmddHHmmss');
-  const TxnRef = order.billCode;
+  const TxnRef = await order.CreateBillCode();
   const amount = order.total;
 
   const orderInfo = `Thanh toán hoá đơn bàn ${order?.table?.name}. Thành tiền: ${amount} VNĐ`;
@@ -132,6 +132,8 @@ const vnpayIPN = async (req) => {
       if(rspCode==="00"){
         order.paymentStatus = "completed";
         order.isPaid = true;
+        order.paidAt = new Date();
+        order.checkoutMethod = "banking";
         await order.save();
 
         return {RspCode: '00', Message: 'Success'}

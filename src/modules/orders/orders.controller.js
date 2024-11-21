@@ -122,6 +122,14 @@ const addDiscountToOrder = catchAsync(async (req, res, next) => {
   res.json(data);
 });
 
+const removeDiscountFromOrder = catchAsync(async (req, res, next) => {
+  const data = await OrdersService.removeDiscountFromOrder({
+    id: req?.params?.id,
+    discountId: req?.params?.discountId,
+  });
+  res.json(data);
+});
+
 export default {
   createOrder,
   getOrders,
@@ -135,5 +143,6 @@ export default {
   updateInfoOrder,
   splitTable,
   mergeTable,
-  addDiscountToOrder
+  addDiscountToOrder,
+  removeDiscountFromOrder
 }

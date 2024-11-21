@@ -323,11 +323,14 @@ const addProductToOrder = async ({
 
 const updateIsPaidOrder = async ({
   id,
-  isPaid
+  isPaid,
+  checkoutMethod = "cash"
 }) => {
   const order = await Order.findByIdAndUpdate(id, {
     isPaid,
-    paidAt: isPaid ? new Date() : null
+    paidAt: isPaid ? new Date() : null,
+    paymentStatus: isPaid ? "completed" : "pending",
+    checkoutMethod: isPaid ? checkoutMethod : null
   }, {
     new: true,
   });
@@ -466,6 +469,27 @@ const addDiscountToOrder = async ({
   return order;
 }
 
+const removeDiscountFromOrder = async ({
+  id,
+  discountId
+}) => {
+  const order = await Order.findById(id);
+  if (!order) {
+    throw new BadRequestError("order_not_existed");
+  }
+
+  const discountIndex = order.discounts.findIndex(item => item._id.toString() === discountId);
+  if (discountIndex === -1) {
+    throw new BadRequestError("discount_not_existed");
+  }
+
+  order.discounts.splice(discountIndex, 1);
+
+  await order.save();
+
+  return order;
+}
+
 export default {
   createOrder,
   getOrders,
@@ -479,5 +503,6 @@ export default {
   updateInfoOrder,
   splitTable,
   mergeTable,
-  addDiscountToOrder
+  addDiscountToOrder,
+  removeDiscountFromOrder
 };

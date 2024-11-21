@@ -85,6 +85,11 @@ const OrderSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'completed', 'failed'],
     default: 'pending'
+  },
+  checkoutMethod: {
+    type: String,
+    enum: ['cash', 'banking'],
+    default: null
   }
 }, {
   timestamps: true,
@@ -113,6 +118,12 @@ OrderSchema.pre("save", async function (next) {
   }
   next();
 });
+
+OrderSchema.methods.CreateBillCode = async function () {
+  const table = await Table.findById(this.table);
+  this.billCode = `B${moment().format("DDMMYYYY-HHmm")}-${slugify(table.name, {lower: false})}`;
+  return this.billCode;
+}
 
 OrderSchema.plugin(mongooseAutoPopulate);
 
