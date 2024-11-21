@@ -31,6 +31,7 @@ const createPaymentUrl = async (req) => {
 
   const createDate = dateFormat(date, 'yyyymmddHHmmss');
   const TxnRef = await order.CreateBillCode();
+  // console.log(TxnRef);
   const amount = order.total;
 
   const orderInfo = `Thanh toán hoá đơn bàn ${order?.table?.name}. Thành tiền: ${amount} VNĐ`;

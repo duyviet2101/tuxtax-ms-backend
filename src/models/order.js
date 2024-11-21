@@ -121,7 +121,7 @@ OrderSchema.pre("save", async function (next) {
 
 OrderSchema.methods.CreateBillCode = async function () {
   const table = await Table.findById(this.table);
-  this.billCode = `B${moment().format("DDMMYYYY-HHmm")}-${slugify(table.name, {lower: false})}`;
+  this.billCode = `B${moment().format("DDMMYYYY-HHmmss")}-${slugify(table.name, {lower: false})}`;
   await this.save();
   return this.billCode;
 }
