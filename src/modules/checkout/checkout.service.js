@@ -22,12 +22,13 @@ const createPaymentUrl = async (req) => {
   const orderId = req.body.orderId;
   const order = await Order.findOne({
     _id: orderId,
-    paymentStatus: 'pending',
     isPaid: false
   });
   if (!order) {
     throw new BadRequestError("order_not_existed");
   }
+  order.paymentStatus = "pending";
+  await order.save();
 
   const createDate = dateFormat(date, 'yyyymmddHHmmss');
   const TxnRef = await order.CreateBillCode();
