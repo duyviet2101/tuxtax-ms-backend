@@ -49,7 +49,7 @@ const router = Router();
  *       '200':
  *         description: List of floors retrieved successfully
  */
-router.get("/", userMiddleware, adminMiddleware, FloorsController.getAllFloors);
+router.get("/", userMiddleware, FloorsController.getAllFloors);
 
 /**
  * @swagger
@@ -70,7 +70,7 @@ router.get("/", userMiddleware, adminMiddleware, FloorsController.getAllFloors);
  *       '400':
  *         description: floor_not_existed
  */
-router.get("/:slug", userMiddleware, adminMiddleware, FloorsController.getFloorBySlug);
+router.get("/:slug", userMiddleware, FloorsController.getFloorBySlug);
 
 /**
  * @swagger
