@@ -14,6 +14,9 @@ const createOrder = async ({
   if (!tableExist) {
     throw new BadRequestError("table_not_existed");
   }
+  if (!tableExist.active) {
+    throw new BadRequestError("table_not_active");
+  }
   const orderExist = await Order.findOne({
     table,
     $or: [
