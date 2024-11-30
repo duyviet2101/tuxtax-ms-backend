@@ -68,32 +68,62 @@ const createPaymentUrl = async (req) => {
 }
 
 const vnpayReturn = async (req) => {
-  let vnp_Params = req.query;
+  try {
+    let vnp_Params = req.query;
 
-  let secureHash = vnp_Params['vnp_SecureHash'];
-  let TxnRef = vnp_Params['vnp_TxnRef'];
-
-  delete vnp_Params['vnp_SecureHash'];
-  delete vnp_Params['vnp_SecureHashType'];
-
-  vnp_Params = sortObject(vnp_Params);
-
-  let tmnCode = config.vnp_TmnCode;
-  let secretKey = config.vnp_HashSecret;
-
-  let signData = qs.stringify(vnp_Params, { encode: false });
-  let hmac = crypto.createHmac("sha512", secretKey);
-  let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
-
-  if(secureHash === signed){
-    //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-    return {
-      code: vnp_Params['vnp_ResponseCode']
+    let secureHash = vnp_Params['vnp_SecureHash'];
+    let TxnRef = vnp_Params['vnp_TxnRef'];
+    const order = await Order.findOne({
+      billCode: TxnRef
+    });
+    if (!order) {
+      return {code: '01', Message: 'Order not found'}
     }
-  } else{
-    return {
-      code: 97
+    let rspCode = vnp_Params['vnp_ResponseCode'];
+
+    delete vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHashType'];
+
+    vnp_Params = sortObject(vnp_Params);
+
+    let tmnCode = config.vnp_TmnCode;
+    let secretKey = config.vnp_HashSecret;
+
+    let signData = qs.stringify(vnp_Params, { encode: false });
+    let hmac = crypto.createHmac("sha512", secretKey);
+    let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+
+    let checkAmount = (parseInt(vnp_Params['vnp_Amount']) / 100) === order.total;
+    if (!checkAmount) {
+      return {code: '04', Message: 'Amount invalid'}
     }
+    if (order.paymentStatus !== 'pending') {
+      return {code: '02', Message: 'This order has been updated to the payment status'}
+    }
+
+    if(secureHash === signed){
+      if(rspCode==="00"){
+        order.paymentStatus = "completed";
+        order.isPaid = true;
+        order.paidAt = new Date();
+        order.checkoutMethod = "banking";
+        await order.save();
+
+        return {code: '00', Message: 'Success'}
+      }
+      else {
+        order.paymentStatus = "failed";
+        await order.save();
+
+        return {code: '00', Message: 'Success'}
+      }
+    } else{
+      return {
+        code: "97"
+      }
+    }
+  } catch (e) {
+    return {code: "99"}
   }
 }
 
