@@ -2,13 +2,15 @@ import {Floor, Order, Product, Table} from "../../models/index.js";
 import {BadRequestError} from "../../exception/errorResponse.js";
 import parseFilters from "../../helpers/parseFilters.js";
 import moment from "moment";
+import {getSocketInstance} from "../../socket/index.js";
 
 const createOrder = async ({
   table,
   products,
   name,
   phone,
-  isSplit = false
+  isSplit = false,
+  isAdmin = false
 }) => {
   const tableExist = await Table.findById(table);
   if (!tableExist) {
@@ -55,6 +57,11 @@ const createOrder = async ({
   });
 
   await order.save();
+
+
+  const io = getSocketInstance();
+  io.to("admins").emit("SERVER_ADD_ORDER", { table: tableExist, order });
+  io.to("admins").emit("UPDATE_ORDERS", {});
 
   return order;
 }
@@ -176,6 +183,10 @@ const updateStatusOrder = async ({
   }
 
   await order.save();
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -195,6 +206,10 @@ const deleteOrder = async ({
   if (!order) {
     throw new BadRequestError("order_not_existed");
   }
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -243,6 +258,10 @@ const updateQuantityProduct = async ({
   // }, 0);
 
   await order.save();
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -274,6 +293,10 @@ const deleteProductInOrder = async ({
   // }, 0);
 
   await order.save();
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -321,6 +344,10 @@ const addProductToOrder = async ({
   // }, 0);
 
   await order.save();
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -353,6 +380,10 @@ const updateIsPaidOrder = async ({
   if (!order) {
     throw new BadRequestError("order_not_existed");
   }
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -408,6 +439,8 @@ const splitTable = async ({
     await order.save();
   }
 
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
 
   return res;
 }
@@ -447,6 +480,10 @@ const mergeTable = async ({
 
   await order.save();
   await Order.findByIdAndDelete(orderFrom._id);
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -469,6 +506,10 @@ const addDiscountToOrder = async ({
   });
 
   await order.save();
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
+
   return order;
 }
 
@@ -489,6 +530,9 @@ const removeDiscountFromOrder = async ({
   order.discounts.splice(discountIndex, 1);
 
   await order.save();
+
+  const io = getSocketInstance();
+  io.to("admins").emit("UPDATE_ORDERS", {});
 
   return order;
 }

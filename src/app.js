@@ -11,10 +11,18 @@ import basicAuth from "express-basic-auth";
 //cors
 import cors from "cors";
 import config from "../config.js";
+import {createServer} from "node:http";
+import {Server} from "socket.io";
+import {initializeSocket} from "./socket/index.js";
 
 dotenv.config();
 
 const app = express();
+
+//!socket io
+const server = createServer(app);
+const io = initializeSocket(server);
+global._io = io;
 
 //! init middleware
 app.use(cors());
@@ -101,4 +109,4 @@ app.use((error, req, res, next) => {
 });
 //! end handle error
 
-export default app;
+export default server;

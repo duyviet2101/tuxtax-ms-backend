@@ -7,6 +7,7 @@ const createOrder = catchAsync(async (req, res, next) => {
     products: req?.body?.products,
     name: req?.body?.name,
     phone: req?.body?.phone,
+    isAdmin: req?.body?.isAdmin,
   });
   res.status(201).json(data);
 });

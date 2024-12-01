@@ -1,7 +1,7 @@
-import app from './src/app.js';
 import dotenv from 'dotenv';
 import config from "./config.js";
 import process from 'process';
+import app from "./src/app.js";
 
 dotenv.config();
 
